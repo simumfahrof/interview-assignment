@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-4">
+        <form action="{{ url_for('order') }}" method="post">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" required="required" class="form-control" id="name" name="name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" required="required" class="form-control" id="email" name="email">
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" required="required" class="form-control" id="address" name="address">
+          </div>
+          <div class="form-group">
+            <label for="postal_code">Postal Code</label>
+            <input type="text" required="required" class="form-control" id="postal_code" name="postal_code">
+          </div>
+          <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" required="required" class="form-control" id="city" name="city">
+          </div>
+          <input type="hidden" id="hidden" name="products">
+          <button type="submit" id="order-btn" class="btn btn-primary" onclick="clearCart()">Order</button>
+        </form>
+      </div>
+      <div class="col-8">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Price</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+        <p id="total"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cart = window.sessionStorage.getItem('cart') ? JSON.parse(window.sessionStorage.getItem('cart')) : {};
+    let total = 0;
+
+    if(Object.keys(cart).length == 0) {
+      document.getElementById('order-btn').toggleAttribute('disabled');
+    }
+
+    for(id in cart) {
+      addRow(id);
+      total += cart[id].price * cart[id].quantity;
+    }
+
+    document.getElementById('total').textContent = 'Total: ' + total;
+    document.getElementById('hidden').setAttribute('value', JSON.stringify(cart));
+
+    function addRow(id) {
+      let product = cart[id];
+    
+      let tbody = document.querySelector('tbody');
+      let tr = document.createElement('tr');
+
+      let name = document.createElement('td');
+      name.textContent = product.name;
+      tr.appendChild(name);
+
+      let quantity = document.createElement('td');
+      quantity.textContent = product.quantity;
+      tr.appendChild(quantity);
+
+      let price = document.createElement('td');
+      price.textContent = product.price;
+      tr.appendChild(price);
+
+      let removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.classList.add('btn', 'btn-danger');
+      removeBtn.onclick = () => {
+        total -= product.price * product.quantity;
+        document.getElementById('total').textContent = 'Total: ' + total;
+        delete cart[id];
+        window.sessionStorage.setItem('cart', JSON.stringify(cart));
+        document.getElementById('hidden').setAttribute('value', JSON.stringify(cart));
+        tbody.removeChild(tr)
+      }
+
+      let remove = document.createElement('td');
+      remove.appendChild(removeBtn);
+      tr.appendChild(remove);
+
+      tbody.appendChild(tr);
+    }
+
+    function clearCart() {
+      window.sessionStorage.removeItem('cart');
+    }
+  </script>
+{% endblock %}

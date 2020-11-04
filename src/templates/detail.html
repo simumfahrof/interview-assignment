@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ product.name }}</h1>
+    <p>Price: {{ product.price }}</p>
+    <p>In stock: {{ 'Yes' if product.stock > 0 else 'No' }}</p>
+    <button id="btn" class="btn btn-primary" onclick="addToCart()">Add to cart</button>
+</div>
+
+<script>
+    let cart = window.sessionStorage.getItem('cart') ? JSON.parse(window.sessionStorage.getItem('cart')) : {};
+
+    let cartProduct = cart['{{ product.id }}'] ? cart['{{ product.id }}'] :
+            { name: '{{ product.name }}', price: {{ product.price }}, quantity: 0};
+
+    if({{ product.stock}} == 0 || {{ product.stock}} <= cartProduct.quantity) {
+        disableButton();
+    }
+
+    function addToCart() {
+        cartProduct.quantity++;
+        cart['{{ product.id }}'] = cartProduct;
+        window.sessionStorage.setItem('cart', JSON.stringify(cart));
+
+        if(cartProduct.quantity == {{ product.stock }}) {
+            disableButton();
+        }
+    }
+
+    function disableButton() {
+        let btn = document.getElementById('btn');
+        btn.textContent = 'Out of stock';
+        btn.toggleAttribute('disabled');
+    }
+</script>
+{% endblock %}

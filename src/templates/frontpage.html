@@ -1,27 +1,45 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <title>{{ name }}</title>
-  </head>
-  <body>
+{% extends 'base.html' %}
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="#">{{ name }}</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-2">
+        <form action="{{ url_for('frontpage') }}" method="get">
+          <div class="form-group">
+            <label for="search">Filter</label>
+            <input type="text" class="form-control" id="search" name="search">
+          </div>
+          {% for category in categories %}
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="{{ 'cat%d' % category.id }}" name="{{ category.name }}">
+            <label class="form-check-label" for="{{ 'cat%d' % category.id }}">{{ category.name }}</label>
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
       </div>
-    </nav>
-
-    <div class="container">
-      <div class="row">
-        Velkommen!
-      </div>
+      <div class="col-10">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Category</th>
+              <th scope="col">Price</th>
+              <th scope="col">In stock</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for product in products %}
+            <tr>
+              <td><a href="{{ url_for('detail', id=product.id) }}">{{ product.name }}</a></td>
+              <td>{{ product.category.name }}</td>
+              <td>{{ product.price }}</td>
+              <td>{{ 'Yes' if product.stock > 0 else 'No' }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>  
     </div>
-
-  </body>
-</html>
+  </div>
+{% endblock %}
